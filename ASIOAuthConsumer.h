@@ -7,12 +7,13 @@
 
 #import <Foundation/Foundation.h>
 #import "ASIOAuthConsumerDelegate.h"
+#import "ASIOAuthWebHelperDelegate.h"
 #import "ASIOAuthWebHelper.h"
 #import "ASIHTTPRequest+OAuth.h"
 #import "ASIFormDataRequest+OAuth.h"
 
 // common constants
-#define kASIOAuthConsomerTokenKey @"oauth_token"
+#define kASIOAuthConsumerTokenKey @"oauth_token"
 #define kASIOAuthConsumerTokenSecretKey @"oauth_token_secret"
 #define kASIOAuthConsumerDummyCallbackURL @"http://localhost/oauth_callback/"
 #define kASIOAuthConsumerErrorDomain @"ASIOAuthConsumerErrorDomain"
@@ -23,7 +24,7 @@
 #define kASIOAuthConsumerAccessTokenParseError 102
 #define kASIOAuthConsumerAccessTokenNetworkError 103
 
-@interface ASIOAuthConsumer : NSObject {
+@interface ASIOAuthConsumer : NSObject<ASIOAuthWebHelperDelegate> {
 	NSString* _consumerKey;
 	NSString* _consumerSecret;
 	NSString* _oauthToken;
@@ -36,7 +37,7 @@
 	NSString* _oauthAuthorizeURL;
 	NSString* _oauthAccessTokenURL;
 
-	ASIOAuthWebHelper* _authorizeHelper;
+	id<ASIOAuthWebHelperProtocol> _authorizeHelper;
 	id<ASIOAuthConsumerDelegate> _delegate;
 }
 
@@ -50,7 +51,7 @@
 @property (copy) NSString* oauthRequestTokenURL;
 @property (copy) NSString* oauthAuthorizeURL;
 @property (copy) NSString* oauthAccessTokenURL;
-@property (retain) ASIOAuthWebHelper* authorizeHelper;
+@property (retain) id<ASIOAuthWebHelperProtocol> authorizeHelper;
 @property (assign) id<ASIOAuthConsumerDelegate> delegate;
 
 - (id)initWithConsumerKey:(NSString*)key consumerSecret:(NSString*)secret;

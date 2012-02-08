@@ -27,17 +27,18 @@
 @synthesize webViewNavBar = _webViewNavBar;
 @synthesize spinner = _spinner;
 @synthesize isShown = _isShown;
+@synthesize delegate = _delegate;
 
-- (id)initWithConsumer:(ASIOAuthConsumer*)consumer
+- (id)init
 {
 	self = [super init];
 	
 	if(self) {
-		self.consumer = consumer;
 		self.webView = nil;
 		self.webViewNavBar = nil;
 		self.spinner = nil;
 		self.isShown = FALSE;
+		self.delegate = nil;
 	}
 	
 	return self;
@@ -49,11 +50,11 @@
 		[self.webView stopLoading];
 		[self.webView removeFromSuperview];
 	}
-	
-	self.consumer = nil;
+
 	self.webView = nil;
 	self.webViewNavBar = nil;
 	self.spinner = nil;
+	self.delegate = nil;
 	
 	[super dealloc];
 }
@@ -129,6 +130,7 @@
 	
 	self.view = [[[UIView alloc] initWithFrame:CGRectMake(0, windowRect.size.height, windowRect.size.width, windowRect.size.height-20)] autorelease];
 	self.view.hidden = TRUE;
+	self.view.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewDidLoad
@@ -181,12 +183,9 @@
 	
 	NSLog(@"redirect: %@", [pageURL absoluteString]);
 	
-	if([[[pageURL absoluteString] lowercaseString] hasPrefix:[self.consumer.oauthCallbackURL lowercaseString]]) 
-	{
-		[self hide];
-		[self.consumer requestAccessToken];
-		return FALSE;
-	}
+	if([self.delegate respondsToSelector:@selector(oauthWebHelper:shouldFollowRedirect:)])
+		if(![self.delegate oauthWebHelper:self shouldFollowRedirect:request])
+			return FALSE;
 	
 	self.spinner.hidden = FALSE;
 	[self.spinner startAnimating];

@@ -7,13 +7,25 @@
 
 #import <Foundation/Foundation.h>
 #import "ASIOAuthConsumer.h"
+#import "ASIOAuthClientDelegate.h"
 
-@interface ASIOAuthClient : ASIOAuthConsumer<ASIOAuthConsumerDelegate> {
+@interface ASIOAuthClient : NSObject<ASIOAuthConsumerDelegate> {
+	ASIOAuthConsumer* _consumer;
+	id<ASIOAuthClientDelegate> _delegate;
 }
 
-- (id)initWithConsumerKey:(NSString*)key consumerSecret:(NSString*)secret;
+@property (retain) ASIOAuthConsumer* consumer;
+@property (assign) id<ASIOAuthClientDelegate> delegate;
+
+- (id)init;
 - (void)dealloc;
 
-- (void)startAuthorization;
+- (void)authorize;
+
+@end
+
+@interface ASIOAuthClient(ProtectedMethods)
+
+- (void)failWithError:(NSError*)error;
 
 @end

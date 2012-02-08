@@ -36,6 +36,7 @@
 		self.oauthTokenSecret = nil;
 		self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
 		self.oauthLocale = nil;
+		self.oauthUserData = nil;
 		self.oauthRequestTokenURL = nil;
 		self.oauthAuthorizeURL = nil;
 		self.oauthAccessTokenURL = nil;
@@ -57,6 +58,7 @@
 	self.oauthTokenSecret = nil;
 	self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
 	self.oauthLocale = nil;
+	self.oauthUserData = nil;
 	self.oauthRequestTokenURL = nil;
 	self.oauthAuthorizeURL = nil;
 	self.oauthAccessTokenURL = nil;
@@ -80,6 +82,7 @@
 	// reset any tokens while re-authentication
 	self.oauthToken = nil;
 	self.oauthTokenSecret = nil;
+	self.oauthUserData = nil;
 
 	[self signRequest:request];
 	[request startAsynchronous];
@@ -88,25 +91,42 @@
 - (void)authorize {
 	NSURL* authorizeURL;
 	NSMutableDictionary* params = [[[NSMutableDictionary alloc] init] autorelease];
-	
+
 	NSAssert(self.oauthAuthorizeURL != nil, @"oauthAuthorizeURL must be specified.");
-	
+
 	// create generic webview helper if none assigned
 	if(!self.authorizeHelper) {
-		self.authorizeHelper = [[ASIOAuthWebHelper alloc] initWithConsumer:self];
+		self.authorizeHelper = [[[ASIOAuthWebHelper alloc] init] autorelease];
 	}
-	
-	[params setObject:self.oauthToken forKey:kASIOAuthConsomerTokenKey];
+
+	[params setObject:self.oauthToken forKey:kASIOAuthConsumerTokenKey];
 
 	if(self.oauthCallbackURL)
 		[params setObject:self.oauthCallbackURL forKey:@"oauth_callback"];
 
 	if(self.oauthLocale)
 		[params setObject:self.oauthLocale forKey:@"oauth_locale"];
-	
+
 	authorizeURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@?%@", self.oauthAuthorizeURL, [self dictionaryToQueryString:params]]];
-	
+
+	[self.authorizeHelper setDelegate:self];
 	[self.authorizeHelper showWithURL:authorizeURL];
+}
+
+- (BOOL)oauthWebHelper:(id<ASIOAuthWebHelperProtocol>)webHelper shouldFollowRedirect:(NSURLRequest*)request {
+	NSURL* pageURL = [request URL];
+
+	if([[[pageURL absoluteString] lowercaseString] hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
+	{
+		if([self.delegate respondsToSelector:@selector(oauthConsumerDidAuthorize:)])
+			[self.delegate oauthConsumerDidAuthorize:self];
+		
+		[webHelper hide];
+		
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 - (void)requestAccessToken {
@@ -143,7 +163,7 @@
 									   code:kASIOAuthConsumerRequestTokenNetworkError 
 								   userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Invalid request token response.", @"") forKey:NSLocalizedDescriptionKey]];
 	
-	self.oauthToken = [response objectForKey:kASIOAuthConsomerTokenKey];
+	self.oauthToken = [response objectForKey:kASIOAuthConsumerTokenKey];
 	self.oauthTokenSecret = [response objectForKey:kASIOAuthConsumerTokenSecretKey];
 	
 	if(self.oauthToken && self.oauthTokenSecret) {
@@ -172,14 +192,14 @@
 									   code:kASIOAuthConsumerAccessTokenParseError 
 								   userInfo:[NSDictionary dictionaryWithObject:NSLocalizedString(@"Invalid access token response.", @"") forKey:NSLocalizedDescriptionKey]];
 
-	self.oauthToken = [dict objectForKey:kASIOAuthConsomerTokenKey];
+	self.oauthToken = [dict objectForKey:kASIOAuthConsumerTokenKey];
 	self.oauthTokenSecret = [dict objectForKey:kASIOAuthConsumerTokenSecretKey];
 
 	if(self.oauthToken && self.oauthTokenSecret)
 	{
 		keys = [[[NSMutableArray alloc] initWithArray:[dict allKeys]] autorelease];
 
-		[keys removeObject:kASIOAuthConsomerTokenKey];
+		[keys removeObject:kASIOAuthConsumerTokenKey];
 		[keys removeObject:kASIOAuthConsumerTokenSecretKey];
 
 		values = [dict objectsForKeys:keys notFoundMarker:[NSNull null]];
@@ -197,11 +217,11 @@
 }
 
 - (NSString*)encodeToPercentEscapeString:(NSString*)string {
-	return (NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) string, NULL, (CFStringRef) @"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
+	return [(NSString *)CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef) string, NULL, (CFStringRef) @"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8) autorelease];
 }
 
 - (NSString*)decodeFromPercentEscapeString:(NSString*)string {
-	return (NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef)string, CFSTR(""), kCFStringEncodingUTF8);
+	return [(NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL, (CFStringRef)string, CFSTR(""), kCFStringEncodingUTF8) autorelease];
 }
 
 - (NSString*)dictionaryToQueryString:(NSDictionary*)dict {
