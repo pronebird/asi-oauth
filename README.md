@@ -26,6 +26,10 @@ Basic usage:
 	
 	// this starts authorization, e.g. pops up WebView overlay
 	[oauthClient authorize];
+	
+Request signing:
+
+	[oauthClient.consumer signRequest:yourASIHTTPRequest];
 
 It's possible to override WebView-based helper with your own implementation. Your class must comform to 
 ASIOAuthWebHelperProtocol and use ASIOAuthWebHelperDelegate to return redirect requests to ASIOAuthConsumer, 
