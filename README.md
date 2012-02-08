@@ -4,6 +4,7 @@ ASI-OAuth
 This is implementation of OAuth 1.0 signing + authorization flow, built on top of ASI-HTTP-Request. 
 
 This set of classes depends on:
+
 - https://github.com/keybuk/asi-http-request-oauth
 - https://github.com/pokeb/asi-http-request
 
