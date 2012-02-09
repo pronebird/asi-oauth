@@ -27,6 +27,8 @@ Basic usage:
 	// this starts authorization, e.g. pops up WebView overlay
 	[oauthClient authorize];
 	
+Any extra data (like user id) returned by OAuth provider saves to `oauthClient.consumer.userData` on successful authorization.
+
 Request signing:
 
 	[oauthClient.consumer signRequest:yourASIHTTPRequest];
