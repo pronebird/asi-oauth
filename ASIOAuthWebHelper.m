@@ -127,6 +127,7 @@
 	
 	self.view = [[[UIView alloc] initWithFrame:CGRectMake(0, windowRect.size.height, windowRect.size.width, windowRect.size.height-20)] autorelease];
 	self.view.hidden = TRUE;
+	self.view.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewDidLoad
