@@ -30,6 +30,7 @@
 	NSString* _oauthToken;
 	NSString* _oauthTokenSecret;
 	NSString* _oauthCallbackURL;
+	NSString* _oauthCancelURL;
 	NSString* _oauthLocale;
 	NSDictionary* _oauthUserData;
 
@@ -51,6 +52,7 @@
 @property (copy) NSString* oauthRequestTokenURL;
 @property (copy) NSString* oauthAuthorizeURL;
 @property (copy) NSString* oauthAccessTokenURL;
+@property (copy) NSString* oauthCancelURL;
 @property (retain) id<ASIOAuthWebHelperProtocol> authorizeHelper;
 @property (assign) id<ASIOAuthConsumerDelegate> delegate;
 

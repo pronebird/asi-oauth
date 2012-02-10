@@ -18,6 +18,7 @@
 @synthesize oauthToken = _oauthToken;
 @synthesize oauthTokenSecret = _oauthTokenSecret;
 @synthesize oauthCallbackURL = _oauthCallbackURL;
+@synthesize oauthCancelURL = _oauthCancelURL;
 @synthesize oauthLocale = _oauthLocale;
 @synthesize oauthUserData = _oauthUserData;
 @synthesize oauthRequestTokenURL = _oauthRequestTokenURL;
@@ -35,6 +36,7 @@
 		self.oauthToken = nil;
 		self.oauthTokenSecret = nil;
 		self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
+		self.oauthCancelURL = nil;
 		self.oauthLocale = nil;
 		self.oauthUserData = nil;
 		self.oauthRequestTokenURL = nil;
@@ -57,6 +59,7 @@
 	self.oauthToken = nil;
 	self.oauthTokenSecret = nil;
 	self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
+	self.oauthCancelURL = nil;
 	self.oauthLocale = nil;
 	self.oauthUserData = nil;
 	self.oauthRequestTokenURL = nil;
@@ -82,7 +85,7 @@
 	// reset any tokens while re-authentication
 	self.oauthToken = nil;
 	self.oauthTokenSecret = nil;
-	self.oauthUserData = nil;
+	self.oauthUserData = [NSDictionary dictionary];
 
 	[self signRequest:request];
 	[request startAsynchronous];
@@ -114,12 +117,24 @@
 }
 
 - (BOOL)oauthWebHelper:(id<ASIOAuthWebHelperProtocol>)webHelper shouldFollowRedirect:(NSURLRequest*)request {
-	NSURL* pageURL = [request URL];
+	NSString* urlString = [[[request URL] absoluteString] lowercaseString];
 
-	if([[[pageURL absoluteString] lowercaseString] hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
+	// handle callback redirects
+	if([urlString hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
 	{
 		if([self.delegate respondsToSelector:@selector(oauthConsumerDidAuthorize:)])
 			[self.delegate oauthConsumerDidAuthorize:self];
+		
+		[webHelper hide];
+		
+		return FALSE;
+	}
+
+	// handle user abort
+	if([urlString hasPrefix:[self.oauthCancelURL lowercaseString]])
+	{
+		if([self.delegate respondsToSelector:@selector(oauthConsumerDidCancelAuthorization:)])
+			[self.delegate oauthConsumerDidCancelAuthorization:self];
 		
 		[webHelper hide];
 		

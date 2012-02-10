@@ -36,7 +36,6 @@
 }
 
 - (void)oauthConsumerDidGetRequestToken:(ASIOAuthConsumer*)consumer {
-	NSLog(@"oauthConsumer requestToken: %@, secret: %@.", consumer.oauthToken, consumer.oauthTokenSecret);
 	[self.consumer authorize];
 }
 
@@ -44,10 +43,12 @@
 	[consumer requestAccessToken];
 }
 
+- (void)oauthConsumerDidCancelAuthorization:(ASIOAuthConsumer *)consumer {
+	if([self.delegate respondsToSelector:@selector(oauthClientDidCancelAuthorization:)])
+		[self.delegate oauthClientDidCancelAuthorization:self];
+}
+
 - (void)oauthConsumerDidGetAccessToken:(ASIOAuthConsumer*)consumer {
-	NSLog(@"oauthConsumer access token received: %@, secret: %@.", consumer.oauthToken, consumer.oauthTokenSecret);
-	NSLog(@"oauthConsumer userdata: %@", consumer.oauthUserData);
-	
 	if([self.delegate respondsToSelector:@selector(oauthClientDidAuthorize:)])
 		[self.delegate oauthClientDidAuthorize:self];
 }
@@ -60,9 +61,7 @@
 	[self failWithError:error];
 }
 
-- (void)failWithError:(NSError*)error {
-	NSLog(@"oauthConsumer error: %@", [error localizedDescription]);
-	
+- (void)failWithError:(NSError*)error {	
 	if([self.delegate respondsToSelector:@selector(oauthClient:didFailWithError:)])
 		[self.delegate oauthClient:self didFailWithError:error];
 }

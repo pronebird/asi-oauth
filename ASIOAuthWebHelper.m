@@ -173,11 +173,7 @@
 }
 
 - (BOOL)webView:(UIWebView*)aWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
-{
-	NSURL* pageURL = [request URL];
-	
-	NSLog(@"redirect: %@", [pageURL absoluteString]);
-	
+{	
 	if([self.delegate respondsToSelector:@selector(oauthWebHelper:shouldFollowRedirect:)])
 		if(![self.delegate oauthWebHelper:self shouldFollowRedirect:request])
 			return FALSE;
@@ -203,11 +199,6 @@
 	self.spinner.hidden = TRUE;
 	self.webView.hidden = FALSE;
 	[self.spinner stopAnimating];
-	
-	NSLog(@"webViewDidFinishLoad: %@", [[aWebView.request URL] absoluteString]);
-	
-	//self.webView.hidden = TRUE;
-	//[self hide];
 }
 
 - (void)onCloseButton {

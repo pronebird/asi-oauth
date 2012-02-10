@@ -20,6 +20,9 @@ Basic usage:
 	oauthClient.consumer.oauthRequestTokenURL = @"https://api.dropbox.com/1/oauth/request_token";
 	oauthClient.consumer.oauthAuthorizeURL = @"https://www.dropbox.com/1/oauth/authorize";
 	oauthClient.consumer.oauthAccessTokenURL = @"https://api.dropbox.com/1/oauth/access_token";
+
+	// used to detect whether user pressed "cancel" while authorization
+	oauthClient.consumer.oauthCancelURL = @"https://www.dropbox.com/home";
 	
 	// set your delegate, see ASIOAuthClientDelegate.h for details
 	oauthClient.delegate = yourDelegate;

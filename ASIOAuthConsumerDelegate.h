@@ -17,5 +17,6 @@
 - (void)oauthConsumer:(ASIOAuthConsumer*)consumer didFailGetRequestTokenWithError:(NSError*)error;
 - (void)oauthConsumer:(ASIOAuthConsumer*)consumer didFailGetAccessTokenWithError:(NSError*)error;
 - (void)oauthConsumerDidAuthorize:(ASIOAuthConsumer*)consumer;
+- (void)oauthConsumerDidCancelAuthorization:(ASIOAuthConsumer*)consumer;
 
 @end
