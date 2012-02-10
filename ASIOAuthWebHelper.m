@@ -6,13 +6,11 @@
 //
 
 #import "ASIOAuthWebHelper.h"
-#import "ASIOAuthConsumer.h"
 
-#define kASIOAuthConsumerWebHelperAnimDuration .5
+#define kASIOAuthWebHelperAnimDuration .5
 
 @interface ASIOAuthWebHelper()
 
-@property (retain, readwrite) ASIOAuthConsumer* consumer;
 @property (retain, readwrite) UIWebView* webView;
 @property (retain, readwrite) UINavigationBar* webViewNavBar;
 @property (retain, readwrite) UIActivityIndicatorView* spinner;
@@ -22,7 +20,6 @@
 
 @implementation ASIOAuthWebHelper
 
-@synthesize consumer = _consumer;
 @synthesize webView = _webView;
 @synthesize webViewNavBar = _webViewNavBar;
 @synthesize spinner = _spinner;
@@ -85,7 +82,7 @@
 	[UIView beginAnimations:nil context:nil];
 	[UIView setAnimationBeginsFromCurrentState:TRUE];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:kASIOAuthConsumerWebHelperAnimDuration];
+	[UIView setAnimationDuration:kASIOAuthWebHelperAnimDuration];
 	self.view.frame = windowRect;
 	[UIView commitAnimations];
 	
@@ -104,7 +101,7 @@
 	[UIView beginAnimations:nil context:nil];
 	[UIView setAnimationBeginsFromCurrentState:TRUE];
 	[UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
-	[UIView setAnimationDuration:kASIOAuthConsumerWebHelperAnimDuration];
+	[UIView setAnimationDuration:kASIOAuthWebHelperAnimDuration];
 	[UIView setAnimationDelegate:self];
 	[UIView setAnimationDidStopSelector:@selector(webViewHideAnimationDidStop:finished:context:)];
 	self.view.frame = windowRect;
@@ -116,7 +113,7 @@
 	[self.webView endEditing:TRUE];
 }
 
-- (void) webViewHideAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context
+- (void)webViewHideAnimationDidStop:(NSString *)animationID finished:(NSNumber *)finished context:(void *)context
 {
 	self.view.hidden = TRUE;
 	
@@ -130,7 +127,6 @@
 	
 	self.view = [[[UIView alloc] initWithFrame:CGRectMake(0, windowRect.size.height, windowRect.size.width, windowRect.size.height-20)] autorelease];
 	self.view.hidden = TRUE;
-	self.view.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewDidLoad
@@ -157,8 +153,6 @@
 									windowRect.origin.y + (windowRect.size.height / 2.0 - spinnerRect.size.height / 2.0), spinnerRect.size.width, spinnerRect.size.height);
 	
 	self.webView = [[[UIWebView alloc] initWithFrame:windowRect] autorelease];
-	self.webView.opaque = FALSE;
-	self.webView.backgroundColor = [UIColor clearColor];
 	self.webView.delegate = self;
 	
 	[self.view addSubview:self.webViewNavBar];

@@ -19,7 +19,6 @@
 	id<ASIOAuthWebHelperDelegate> _delegate;
 }
 
-@property (retain, readonly) ASIOAuthConsumer* consumer;
 @property (retain, readonly) UIWebView* webView;
 @property (retain, readonly) UINavigationBar* webViewNavBar;
 @property (retain, readonly) UIActivityIndicatorView* spinner;
