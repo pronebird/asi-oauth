@@ -36,7 +36,7 @@ Request signing:
 
 	[oauthClient.consumer signRequest:yourASIHTTPRequest];
 
-It's possible to override WebView-based helper with your own implementation. Your class must comform to 
+It's possible to override WebView-based helper with your own implementation. Your class must conform to 
 ASIOAuthWebHelperProtocol and use ASIOAuthWebHelperDelegate to return redirect requests to ASIOAuthConsumer, 
 use the following code to replace default helper:
 
