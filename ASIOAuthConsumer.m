@@ -120,7 +120,7 @@
 	NSString* urlString = [[[request URL] absoluteString] lowercaseString];
 
 	// handle callback redirects
-	if([urlString hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
+	if(self.oauthCallbackURL && [urlString hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
 	{
 		if([self.delegate respondsToSelector:@selector(oauthConsumerDidAuthorize:)])
 			[self.delegate oauthConsumerDidAuthorize:self];
@@ -131,7 +131,7 @@
 	}
 
 	// handle user abort
-	if([urlString hasPrefix:[self.oauthCancelURL lowercaseString]])
+	if(self.oauthCancelURL && [urlString hasPrefix:[self.oauthCancelURL lowercaseString]])
 	{
 		if([self.delegate respondsToSelector:@selector(oauthConsumerDidCancelAuthorization:)])
 			[self.delegate oauthConsumerDidCancelAuthorization:self];
