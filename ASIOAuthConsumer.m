@@ -17,6 +17,7 @@
 @synthesize consumerSecret = _consumerSecret;
 @synthesize oauthToken = _oauthToken;
 @synthesize oauthTokenSecret = _oauthTokenSecret;
+@synthesize oauthVerifier = _oauthVerifier;
 @synthesize oauthCallbackURL = _oauthCallbackURL;
 @synthesize oauthCancelURL = _oauthCancelURL;
 @synthesize oauthLocale = _oauthLocale;
@@ -35,6 +36,7 @@
 		self.consumerSecret = secret;
 		self.oauthToken = nil;
 		self.oauthTokenSecret = nil;
+		self.oauthVerifier = nil;
 		self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
 		self.oauthCancelURL = nil;
 		self.oauthLocale = nil;
@@ -58,6 +60,7 @@
 	self.consumerSecret = nil;
 	self.oauthToken = nil;
 	self.oauthTokenSecret = nil;
+	self.oauthVerifier = nil;
 	self.oauthCallbackURL = kASIOAuthConsumerDummyCallbackURL;
 	self.oauthCancelURL = nil;
 	self.oauthLocale = nil;
@@ -85,6 +88,7 @@
 	// reset any tokens while re-authentication
 	self.oauthToken = nil;
 	self.oauthTokenSecret = nil;
+	self.oauthVerifier = nil;
 	self.oauthUserData = [NSDictionary dictionary];
 
 	[self signRequest:request];
@@ -116,12 +120,24 @@
 	[self.authorizeHelper showWithURL:authorizeURL];
 }
 
-- (BOOL)oauthWebHelper:(id<ASIOAuthWebHelperProtocol>)webHelper shouldFollowRedirect:(NSURLRequest*)request {
-	NSString* urlString = [[[request URL] absoluteString] lowercaseString];
+- (BOOL)oauthWebHelper:(id<ASIOAuthWebHelperProtocol>)webHelper shouldFollowRedirect:(NSURLRequest*)request 
+{
+	NSString* urlString = [[request URL] absoluteString];
+	NSString* urlStringLowercase = [urlString lowercaseString];
+	NSString* queryString = nil;
 
 	// handle callback redirects
-	if(self.oauthCallbackURL && [urlString hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
+	if(self.oauthCallbackURL && [urlStringLowercase hasPrefix:[self.oauthCallbackURL lowercaseString]]) 
 	{
+		// extract oauth_verifier from callback
+		NSRange target = [urlString rangeOfString:@"?"];
+
+		if(target.length > 0) {
+			queryString = [urlString substringFromIndex:target.location+1];
+			if(queryString)
+				self.oauthVerifier = [[self parseQueryString:queryString] objectForKey:@"oauth_verifier"];
+		}
+
 		if([self.delegate respondsToSelector:@selector(oauthConsumerDidAuthorize:)])
 			[self.delegate oauthConsumerDidAuthorize:self];
 		
@@ -131,7 +147,7 @@
 	}
 
 	// handle user abort
-	if(self.oauthCancelURL && [urlString hasPrefix:[self.oauthCancelURL lowercaseString]])
+	if(self.oauthCancelURL && [urlStringLowercase hasPrefix:[self.oauthCancelURL lowercaseString]])
 	{
 		if([self.delegate respondsToSelector:@selector(oauthConsumerDidCancelAuthorization:)])
 			[self.delegate oauthConsumerDidCancelAuthorization:self];
@@ -160,7 +176,12 @@
 }
 
 - (void)signRequest:(ASIHTTPRequest*)request {
-	[request signRequestWithClientIdentifier:self.consumerKey secret:self.consumerSecret tokenIdentifier:self.oauthToken secret:self.oauthTokenSecret usingMethod:ASIOAuthHMAC_SHA1SignatureMethod];
+	[request signRequestWithClientIdentifier:self.consumerKey 
+									  secret:self.consumerSecret 
+							 tokenIdentifier:self.oauthToken 
+									  secret:self.oauthTokenSecret
+									verifier:self.oauthVerifier
+								 usingMethod:ASIOAuthHMAC_SHA1SignatureMethod];
 }
 
 - (void)requestTokenFailed:(ASIHTTPRequest*)request {

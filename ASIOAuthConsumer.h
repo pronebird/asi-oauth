@@ -29,6 +29,7 @@
 	NSString* _consumerSecret;
 	NSString* _oauthToken;
 	NSString* _oauthTokenSecret;
+	NSString* _oauthVerifier;
 	NSString* _oauthCallbackURL;
 	NSString* _oauthCancelURL;
 	NSString* _oauthLocale;
@@ -46,6 +47,7 @@
 @property (copy) NSString* consumerSecret;
 @property (copy) NSString* oauthToken;
 @property (copy) NSString* oauthTokenSecret;
+@property (copy) NSString* oauthVerifier;
 @property (copy) NSString* oauthCallbackURL;
 @property (copy) NSString* oauthLocale;
 @property (readonly, retain) NSDictionary* oauthUserData;
